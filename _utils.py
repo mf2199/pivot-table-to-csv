@@ -89,3 +89,19 @@ def write_csv(io, string):
         logging.error("Output file couldn't be opened")
     finally:
         file.close()
+
+
+def parse_column_metadata(column_metadata):
+    levels = parse_shared_items(column_metadata.find("sharedItems"))
+    return {
+        "column_name": cast_tag_value("s", column_metadata["name"]),
+        "is_categorical": len(levels) > 0,
+        "levels": levels
+    }
+
+
+def parse_shared_items(shared_items):
+    levels_tags = []
+    if shared_items is not None:
+        levels_tags = shared_items.findAll()
+    return [cast_tag_value(item.name, item.get("v", "")) for item in levels_tags]
