@@ -4,7 +4,7 @@ from optparse import OptionParser
 
 import progressbar
 
-import models
+import pivot_cache
 from utils import spreadsheetml_parser
 
 
@@ -51,8 +51,8 @@ if __name__ == "__main__":
     file_name, output_file, n_chunks = _parse_console_input()
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
-    records = models.PivotCacheRecords(file_name).read()
-    metadatas = models.PivotCacheDefinition(file_name).parse()
+    records = pivot_cache.PivotCacheRecords(file_name).read()
+    metadatas = pivot_cache.PivotCacheDefinition(file_name).parse()
 
     bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
     bar.update(0)
