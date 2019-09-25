@@ -17,8 +17,9 @@ def xml_to_csv(xml_str, batch_string, metadata=None):
 			idx += 1
 
 
-def split_xml(xml, n_batches=5):
-	cut_size = int(len(xml) / n_batches)
+def split_xml(xml, num_chunks=5):
+	logging.info('Splitting XML into {} chunks'.format(num_chunks))
+	cut_size = int(len(xml) / num_chunks)
 	start_index = 0
 	xml_chunks = []
 	for idx in range(cut_size, len(xml) + 1, cut_size):
@@ -50,7 +51,8 @@ def cast_tag_value(tag, value):
 		raise TypeError("Tag {0} is not defined to be casted".format(tag))
 
 
-def get_valid_pivot_cache_records_xml(file_chunks, index):
+def get_xml_chunk(xml_chunks, index):
+	logging.info('Converting chunk {} of {}...'.format(index, len(xml_chunks)))
 	header = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                     <pivotCacheRecords 
                         xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -60,11 +62,11 @@ def get_valid_pivot_cache_records_xml(file_chunks, index):
     """
 	footer = "</pivotCacheRecords>"
 	if index == 0:
-		return file_chunks[index] + footer
-	elif index == len(file_chunks) - 1:
-		return header + file_chunks[index]
+		return xml_chunks[index] + footer
+	elif index == len(xml_chunks) - 1:
+		return header + xml_chunks[index]
 	else:
-		return header + file_chunks[index] + footer
+		return header + xml_chunks[index] + footer
 
 
 def _get_next_valid_index(xml, seed, close_tag="</r>"):

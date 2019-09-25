@@ -30,14 +30,14 @@ def _parse_console_input():
 
 
 if __name__ == "__main__":
-    file_name, output_file, n_chunks = _parse_console_input()
+    file_name, output_file, num_chunks = _parse_console_input()
 
     logging.info('Extracting pivotCacheRecords from {}..'.format(file_name))
     cache = pivot_cache.PivotCache(file_name)
     records = cache.read()
     metadatas = cache.parse()
 
-    progress_bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
+    progress_bar = progressbar.ProgressBar(max_value=len(records) * num_chunks)
     progress_bar.update(0)
     for i, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         batch_string = Manager().list()
@@ -50,21 +50,19 @@ if __name__ == "__main__":
         batch_string.append(header + '\n')
         logging.debug(header)
 
-        logging.info('Splitting pivotCacheRecords{}.xml into {} chunks'.format(i, n_chunks))
-        chunks = _utils.split_xml(xml, n_chunks)
+        chunks = _utils.split_xml(xml, num_chunks)
 
         for j in range(len(chunks)):
-            logging.info('Converting chunk {} of pivotCacheRecords{}.csv'.format(j, i))
-            valid_xml = _utils.get_valid_pivot_cache_records_xml(chunks, j)
+            xml_chunk = _utils.get_xml_chunk(chunks, j)
+            logging.debug('Chunk head {}'.format(xml_chunk[:200]))
+            logging.debug('Chunk tail {}'.format(xml_chunk[-200:]))
 
-            logging.debug('Chunk head {}'.format(valid_xml[:200]))
-            logging.debug('Chunk tail {}'.format(valid_xml[-200:]))
             p = Process(target=_utils.xml_to_csv,
-                        args=(valid_xml, batch_string, metadata,))
+                        args=(xml_chunk, batch_string, metadata,))
 
             p.start()
             p.join()
-            logging.info('Chunk {} of pivotCacheRecords{}.csv successfully converted'.format(j, i))
+            logging.info('Chunk {} of {} has been successfully processed'.format(j, i))
             progress_bar.update(int((j + 1) + (i - 1) * len(chunks)))
 
         _utils.write_csv('{}-{}'.format(output_file, i), batch_string)
