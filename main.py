@@ -38,7 +38,7 @@ def _get_header(metadata):
 def _write_csv(io, string):
     file = None
     try:
-        file = open(io, "w")
+        file = open(io, 'w', encoding='utf-8')
         file.write("".join(string))
         file.flush()
     except IOError:
