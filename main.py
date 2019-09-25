@@ -1,11 +1,13 @@
 import logging
 from multiprocessing import Manager, Process
 from optparse import OptionParser
-import progressbar
+# import progressbar
 
 import pivot_cache
 import _utils
 
+# Command line example:
+# python main.py --file C:\hartree\files\argentina\td_cargas_y_subproductos_obtenidos.xlsx
 
 def _parse_console_input():
     parser = OptionParser()
@@ -37,8 +39,8 @@ if __name__ == "__main__":
     records = cache.read()
     metadatas = cache.parse()
 
-    progress_bar = progressbar.ProgressBar(max_value=len(records) * num_chunks)
-    progress_bar.update(0)
+    # progress_bar = progressbar.ProgressBar(max_value=len(records) * num_chunks)
+    # progress_bar.update(0)
     for i, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         batch_string = Manager().list()
 
@@ -63,6 +65,6 @@ if __name__ == "__main__":
             p.start()
             p.join()
             logging.info('Chunk {} of {} has been successfully processed'.format(j, i))
-            progress_bar.update(int((j + 1) + (i - 1) * len(chunks)))
+            # progress_bar.update(int((j + 1) + (i - 1) * len(chunks)))
 
         _utils.write_csv('{}-{}'.format(output_file, i), batch_string)
