@@ -54,9 +54,9 @@ if __name__ == "__main__":
     records = PivotCacheRecords(file_name).read()
     metadatas = PivotCacheDefinition(file_name).parse()
 
-    bar = progressbar.ProgressBar(max_value=len(records) * n_chunks + 5)
-    for idy, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
-        bar.update(0)
+    bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
+    bar.update(0)
+    for i, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         batch_string = Manager().list()
 
         logging.info("Extracting metadata from pivotCacheDefinition")
@@ -67,12 +67,12 @@ if __name__ == "__main__":
         batch_string.append(header + '\n')
         logging.debug(header)
 
-        logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", idy, n_chunks)
+        logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", i, n_chunks)
         chunks = spreadsheetml_parser.split_xml(xml, n_chunks)
 
-        for idx in range(len(chunks)):
-            logging.info("Converting chunk %d of pivotCacheRecords%d.csv", idx, idy)
-            valid_xml = spreadsheetml_parser.get_valid_pivot_cache_records_xml(chunks, idx)
+        for j in range(len(chunks)):
+            logging.info("Converting chunk %d of pivotCacheRecords%d.csv", j, i)
+            valid_xml = spreadsheetml_parser.get_valid_pivot_cache_records_xml(chunks, j)
 
             logging.debug("Chunk head %s", valid_xml[:200])
             logging.debug("Chunk tail %s", valid_xml[-200:])
@@ -80,11 +80,11 @@ if __name__ == "__main__":
 
             p.start()
             p.join()
-            logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", idx, idy)
-            bar.update(int((idx + 1) * idy))
+            logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", j, i)
+            bar.update(int((j + 1) + (i - 1) * len(chunks)))
 
         logging.info("Saving result in %s...", output_file)
-        _write_csv(output_file + '-' + str(idy), batch_string)
+        _write_csv(output_file + '-' + str(i), batch_string)
         logging.info("CSV File %s successfully created", output_file)
 
 
