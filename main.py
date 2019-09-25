@@ -37,8 +37,8 @@ if __name__ == "__main__":
     records = cache.read()
     metadatas = cache.parse()
 
-    bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
-    bar.update(0)
+    progress_bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
+    progress_bar.update(0)
     for i, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         batch_string = Manager().list()
 
@@ -50,23 +50,21 @@ if __name__ == "__main__":
         batch_string.append(header + '\n')
         logging.debug(header)
 
-        logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", i, n_chunks)
+        logging.info('Splitting pivotCacheRecords{}.xml into {} chunks'.format(i, n_chunks))
         chunks = _utils.split_xml(xml, n_chunks)
 
         for j in range(len(chunks)):
-            logging.info("Converting chunk %d of pivotCacheRecords%d.csv", j, i)
+            logging.info('Converting chunk {} of pivotCacheRecords{}.csv'.format(j, i))
             valid_xml = _utils.get_valid_pivot_cache_records_xml(chunks, j)
 
-            logging.debug("Chunk head %s", valid_xml[:200])
-            logging.debug("Chunk tail %s", valid_xml[-200:])
+            logging.debug('Chunk head {}'.format(valid_xml[:200]))
+            logging.debug('Chunk tail {}'.format(valid_xml[-200:]))
             p = Process(target=_utils.xml_to_csv,
                         args=(valid_xml, batch_string, metadata,))
 
             p.start()
             p.join()
-            logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", j, i)
-            bar.update(int((j + 1) + (i - 1) * len(chunks)))
+            logging.info('Chunk {} of pivotCacheRecords{}.csv successfully converted'.format(j, i))
+            progress_bar.update(int((j + 1) + (i - 1) * len(chunks)))
 
-        logging.info("Saving result in %s...", output_file)
-        _utils.write_csv(output_file + '-' + str(i), batch_string)
-        logging.info("CSV File %s successfully created", output_file)
+        _utils.write_csv('{}-{}'.format(output_file, i), batch_string)
