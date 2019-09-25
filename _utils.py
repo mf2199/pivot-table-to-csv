@@ -1,5 +1,5 @@
+import logging
 from io import BytesIO
-
 from lxml import etree
 
 
@@ -75,4 +75,17 @@ def _get_next_valid_index(xml, seed, close_tag="</r>"):
     return seed + len(close_tag)
 
 
+def get_header(metadata):
+    return ",".join([column_data["column_name"] for column_data in metadata])
 
+
+def write_csv(io, string):
+    file = None
+    try:
+        file = open(io, 'w', encoding='utf-8')
+        file.write("".join(string))
+        file.flush()
+    except IOError:
+        logging.error("Output file couldn't be opened")
+    finally:
+        file.close()

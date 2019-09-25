@@ -1,7 +1,6 @@
 import logging
-from multiprocessing import Process, Manager
+from multiprocessing import Manager, Process
 from optparse import OptionParser
-
 import progressbar
 
 import pivot_cache
@@ -31,22 +30,6 @@ def _parse_console_input():
     return options.filename, options.outputname, options.nchunks
 
 
-def _get_header(metadata):
-    return ",".join([column_data["column_name"] for column_data in metadata])
-
-
-def _write_csv(io, string):
-    file = None
-    try:
-        file = open(io, 'w', encoding='utf-8')
-        file.write("".join(string))
-        file.flush()
-    except IOError:
-        logging.error("Output file couldn't be opened")
-    finally:
-        file.close()
-
-
 if __name__ == "__main__":
     file_name, output_file, n_chunks = _parse_console_input()
 
@@ -63,7 +46,7 @@ if __name__ == "__main__":
         metadata = list(metadata)
         logging.debug(metadata)
 
-        header = _get_header(metadata)
+        header = _utils.get_header(metadata)
         batch_string.append(header + '\n')
         logging.debug(header)
 
@@ -84,9 +67,5 @@ if __name__ == "__main__":
             bar.update(int((j + 1) + (i - 1) * len(chunks)))
 
         logging.info("Saving result in %s...", output_file)
-        _write_csv(output_file + '-' + str(i), batch_string)
+        _utils.write_csv(output_file + '-' + str(i), batch_string)
         logging.info("CSV File %s successfully created", output_file)
-
-
-
-
