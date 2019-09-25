@@ -38,3 +38,9 @@ class PivotCache:
     @file_name.setter
     def file_name(self, value):
         self._file_name = value
+
+
+class PivotCacheRecords(PivotCache):
+    def __init__(self, file_name):
+        self.pivot_cache_name = 'pivotCacheRecords'
+        self.file_name = file_name
