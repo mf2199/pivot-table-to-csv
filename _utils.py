@@ -13,7 +13,7 @@ def xml_to_csv(xml_str, batch_string, metadata=None):
 			row = []
 			idx = 0
 		else:
-			row += [get_value(elem.get("v", ""), elem.tag[-1], metadata[idx])]
+			row += [_get_xml_value(elem.get("v", ""), elem.tag[-1], metadata[idx])]
 			idx += 1
 
 
@@ -29,7 +29,7 @@ def split_xml(xml, num_chunks=5):
 	return xml_chunks
 
 
-def get_value(value, tag, metadata=None):
+def _get_xml_value(value, tag, metadata=None):
 	if metadata is None or value == "":
 		return cast_tag_value(tag, value)
 	elif tag == "x":
