@@ -3,7 +3,7 @@ from io import BytesIO
 from lxml import etree
 
 
-def str_xml_to_csv(xml_str, batch_string, metadata=None):
+def xml_to_csv(xml_str, batch_string, metadata=None):
     context = etree.iterparse(BytesIO(xml_str.encode("utf-8")))
     row = []
     idx = 0

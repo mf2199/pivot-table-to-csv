@@ -24,8 +24,7 @@ def _parse_console_input():
     if options.verbose is True:
         logging.basicConfig(level=logging.DEBUG)
     if options.outputname is None:
-        file_name = options.filename.split('.')
-        options.outputname = file_name[0] + ".csv"
+        options.outputname = options.filename.split('.')[0] + ".csv"
 
     return options.filename, options.outputname, options.nchunks
 
@@ -33,16 +32,17 @@ def _parse_console_input():
 if __name__ == "__main__":
     file_name, output_file, n_chunks = _parse_console_input()
 
-    logging.info("Extracting pivotCacheRecords from %s..", file_name)
-    records = pivot_cache.PivotCacheRecords(file_name).read()
-    metadatas = pivot_cache.PivotCache().parse(file_name)
+    logging.info('Extracting pivotCacheRecords from {}..'.format(file_name))
+    cache = pivot_cache.PivotCache(file_name)
+    records = cache.read()
+    metadatas = cache.parse()
 
     bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
     bar.update(0)
     for i, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         batch_string = Manager().list()
 
-        logging.info("Extracting metadata from pivotCacheDefinition")
+        logging.info('Extracting metadata from pivotCacheDefinition')
         metadata = list(metadata)
         logging.debug(metadata)
 
@@ -59,7 +59,8 @@ if __name__ == "__main__":
 
             logging.debug("Chunk head %s", valid_xml[:200])
             logging.debug("Chunk tail %s", valid_xml[-200:])
-            p = Process(target=_utils.str_xml_to_csv, args=(valid_xml, batch_string, metadata,))
+            p = Process(target=_utils.xml_to_csv,
+                        args=(valid_xml, batch_string, metadata,))
 
             p.start()
             p.join()
