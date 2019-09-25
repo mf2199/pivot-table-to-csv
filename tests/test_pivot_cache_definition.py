@@ -1,11 +1,11 @@
 import pytest
 
-from pivot_cache import PivotCacheDefinition
+from pivot_cache import PivotCache
 
 
 @pytest.fixture
 def pivot_cache():
-    return PivotCacheDefinition("tests/resources/pivot_table_test.xlsx")
+    return PivotCache("tests/resources/pivot_table_test.xlsx")
 
 
 def test_pivot_cache_definition_characteristics(pivot_cache):

@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
     records = pivot_cache.PivotCacheRecords(file_name).read()
-    metadatas = pivot_cache.PivotCacheDefinition(file_name).parse()
+    metadatas = pivot_cache.PivotCache().parse(file_name)
 
     bar = progressbar.ProgressBar(max_value=len(records) * n_chunks)
     bar.update(0)
