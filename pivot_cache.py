@@ -1,6 +1,6 @@
 import zipfile
 from bs4 import BeautifulSoup
-from utils import cast_tag_value
+from _utils import cast_tag_value
 
 
 class PivotCache:

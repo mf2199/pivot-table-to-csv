@@ -5,7 +5,7 @@ from optparse import OptionParser
 import progressbar
 
 import pivot_cache
-from utils import spreadsheetml_parser
+import _utils
 
 
 def _parse_console_input():
@@ -68,15 +68,15 @@ if __name__ == "__main__":
         logging.debug(header)
 
         logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", i, n_chunks)
-        chunks = spreadsheetml_parser.split_xml(xml, n_chunks)
+        chunks = _utils.split_xml(xml, n_chunks)
 
         for j in range(len(chunks)):
             logging.info("Converting chunk %d of pivotCacheRecords%d.csv", j, i)
-            valid_xml = spreadsheetml_parser.get_valid_pivot_cache_records_xml(chunks, j)
+            valid_xml = _utils.get_valid_pivot_cache_records_xml(chunks, j)
 
             logging.debug("Chunk head %s", valid_xml[:200])
             logging.debug("Chunk tail %s", valid_xml[-200:])
-            p = Process(target=spreadsheetml_parser.str_xml_to_csv, args=(valid_xml, batch_string, metadata,))
+            p = Process(target=_utils.str_xml_to_csv, args=(valid_xml, batch_string, metadata,))
 
             p.start()
             p.join()
